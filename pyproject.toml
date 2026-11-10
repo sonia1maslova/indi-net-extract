@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "indi-net-extract"
+version = "0.1.0.dev0"
+description = "Template-guided individual network extraction and spatial overlap evaluation"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "BSD-3-Clause"}
+dependencies = ["numpy>=1.26", "scipy>=1.11", "nibabel>=5.2", "threadpoolctl>=3.1"]
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Programming Language :: Python :: 3",
+  "Topic :: Scientific/Engineering :: Medical Science Apps.",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools]
+include-package-data = true
+license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md"]
+
+
+[project.urls]
+Source = "https://github.com/sonia1maslova/indi-net-extract"
+Documentation = "https://github.com/sonia1maslova/indi-net-extract/blob/main/README.md"
+Issues = "https://github.com/sonia1maslova/indi-net-extract/issues"
