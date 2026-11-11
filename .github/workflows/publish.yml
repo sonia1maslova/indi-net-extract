@@ -1,0 +1,114 @@
+name: Build and publish to PyPI
+
+"on":
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Upload the checked distributions to PyPI
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pypi-release
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
+        with:
+          python-version: '3.13'
+
+      - name: Install checked build tools
+        run: python -m pip install build==1.6.1 twine==7.0.0 setuptools==83.0.0 wheel==0.48.0
+
+      - name: Build sdist and wheel
+        run: python -m build --no-isolation
+
+      - name: Check package metadata and README
+        run: python -m twine check --strict dist/*
+
+      - name: Check source attachments and license metadata
+        shell: python
+        run: |
+          from email.parser import BytesParser
+          from pathlib import Path, PurePosixPath
+          import tarfile
+          import zipfile
+
+          wheels = list(Path('dist').glob('*.whl'))
+          sdists = list(Path('dist').glob('*.tar.gz'))
+          assert len(wheels) == len(sdists) == 1
+          required = {
+              Path(name) for name in (
+                  'README.md', 'CHANGELOG.md', 'MANIFEST.in', 'pyproject.toml',
+                  'LICENSE', 'THIRD_PARTY_NOTICES.md',
+              )
+          }
+          for pattern in ('src/**/*.py', 'docs/*.md', 'examples/*.py', 'tests/*.py'):
+              required.update(Path('.').glob(pattern))
+          with tarfile.open(sdists[0], 'r:gz') as archive:
+              members = [member for member in archive.getmembers() if member.isfile()]
+              roots = {PurePosixPath(member.name).parts[0] for member in members}
+              assert len(roots) == 1
+              prefix = roots.pop()
+              for path in sorted(required):
+                  member = archive.getmember(prefix + '/' + path.as_posix())
+                  assert archive.extractfile(member).read() == path.read_bytes(), path
+          with zipfile.ZipFile(wheels[0]) as archive:
+              metadata_name = next(name for name in archive.namelist()
+                                   if name.endswith('.dist-info/METADATA'))
+              metadata = BytesParser().parsebytes(archive.read(metadata_name))
+              assert metadata['Name'] == 'indi-net-extract'
+              assert metadata['License-Expression'] == 'BSD-3-Clause'
+              assert set(metadata.get_all('License-File') or []) == {
+                  'LICENSE', 'THIRD_PARTY_NOTICES.md',
+              }
+              license_root = metadata_name.rsplit('/', 1)[0] + '/licenses/'
+              for name in ('LICENSE', 'THIRD_PARTY_NOTICES.md'):
+                  assert archive.read(license_root + name) == Path(name).read_bytes()
+              for path in Path('src').rglob('*.py'):
+                  assert archive.read(path.relative_to('src').as_posix()) == path.read_bytes()
+          print(f'Checked {len(required)} source files and both license notices.')
+
+      - name: Store checked distributions
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: python-package-distributions
+          path: dist/
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    if: inputs.publish && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: pypi
+      url: https://pypi.org/p/indi-net-extract
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Download checked distributions
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: python-package-distributions
+          path: dist/
+
+      - name: Publish to PyPI with Trusted Publishing
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # release/v1
