@@ -30,4 +30,6 @@ python -m pip install .
 python -m unittest discover -s tests -t . -v
 ```
 
-本仓库的单元测试使用合成数据，不需要下载研究影像，不调用MATLAB或FSL。可选的外部对照脚本是tests/validate_distribution.py；它需要额外指定FSL位置，并使用新输出目录。
+本仓库的单元测试使用合成数据，不需要下载研究影像，不调用MATLAB或FSL。可选的分发检查脚本是tests/validate_distribution.py；它要求使用新输出目录。
+
+源码包也包含上述测试模块及其辅助文件。构建、格式检查和从解压目录复查的步骤见[分发说明](distribution.md)。`tests.validate_distribution`不传`--fsl-dir`时只执行合成数据检查，传入该参数时再增加FSL对照。

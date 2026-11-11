@@ -1,0 +1,4 @@
+include README.md CHANGELOG.md
+include docs/methods.md docs/validation.md docs/distribution.md
+recursive-include examples *.py
+recursive-include tests *.py

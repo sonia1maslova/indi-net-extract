@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68", "wheel"]
+requires = ["setuptools>=77.0.3", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -8,7 +8,8 @@ version = "0.1.0.dev0"
 description = "Template-guided individual network extraction and spatial overlap evaluation"
 readme = "README.md"
 requires-python = ">=3.11"
-license = {text = "BSD-3-Clause"}
+license = "BSD-3-Clause"
+license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md"]
 dependencies = ["numpy>=1.26", "scipy>=1.11", "nibabel>=5.2", "threadpoolctl>=3.1"]
 classifiers = [
   "Development Status :: 2 - Pre-Alpha",
@@ -21,7 +22,6 @@ where = ["src"]
 
 [tool.setuptools]
 include-package-data = true
-license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md"]
 
 
 [project.urls]
