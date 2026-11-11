@@ -8,4 +8,4 @@
 - 分发名为indi-net-extract，导入名为indinetextract。
 - 源码包补齐文档、示例和完整测试附件；构建与复查步骤见[分发说明](docs/distribution.md)。
 - 许可证元数据采用标准SPDX表达式和project.license-files，最低构建依赖更新为setuptools 77.0.3。
-- 尚未发布到PyPI；验证范围见docs/validation.md。
+- 2026-11-11首次发布到[PyPI](https://pypi.org/project/indi-net-extract/0.1.0.dev0/)，仍为开发预览版；验证范围见[验证说明](docs/validation.md)。

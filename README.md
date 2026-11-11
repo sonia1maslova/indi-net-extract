@@ -2,15 +2,21 @@
 
 Python分发名（安装名）：`indi-net-extract`。Python导入名和源码包目录：`indinetextract`。
 
-模板引导的个体网络提取工具包，开发初版 `0.1.0.dev0`。目前提供Python源码，尚未发布到PyPI。
+模板引导的个体网络提取工具包，开发预览版 `0.1.0.dev0`，已发布到[PyPI](https://pypi.org/project/indi-net-extract/0.1.0.dev0/)。
 
 输入被试ID列表、逐项对应的静息态影像路径，以及全体共用的模板和mask。输出每名被试的连续网络图、时间序列及运行记录。支持经典双回归β和独立NumPy/SciPy GIG-ICA。
 
 **每名被试只输入一份已经准备好的4D NIfTI。** 数据清洗、扫描标准化、拼接和空间配准在包外完成。批处理列表表示不同被试，不表示要拼接的扫描。算法内部所需的中心化、白化和双回归时间序列归一化仍保留。
 
-## 从源码安装
+## 安装
 
-当前为开发初版，尚未发布到PyPI。可从本仓库安装：
+安装当前开发预览版：
+
+```bash
+python -m pip install "indi-net-extract==0.1.0.dev0"
+```
+
+也可以从本仓库安装源码：
 
 ```bash
 git clone https://github.com/sonia1maslova/indi-net-extract.git
